@@ -13,22 +13,21 @@ struct NavigationSectionView: View {
     @Binding var selectedCategory: String?
     let categories: [NoteCategory]
     
-    // Estado interno que controla el retardo del contenido
     @State private var showNavigationContent: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Botón de navegación
+            // Header de navegación
             Button(action: {
-                withAnimation(.easeInOut(duration: 0.3)) {
+                withAnimation(.easeInOut(duration: 0.25)) {
                     isNavigationCollapsed.toggle()
                 }
                 
                 if isNavigationCollapsed {
                     showNavigationContent = false
                 } else {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                        withAnimation(.easeInOut) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
                             showNavigationContent = true
                         }
                     }
@@ -36,24 +35,25 @@ struct NavigationSectionView: View {
             }) {
                 HStack {
                     Text("Navegación")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.primary)
                     
                     Spacer()
                     
                     Image(systemName: isNavigationCollapsed ? "chevron.down" : "chevron.up")
-                        .font(.caption)
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.secondary)
+                        .rotationEffect(.degrees(isNavigationCollapsed ? 0 : 180))
+                        .animation(.easeInOut(duration: 0.2), value: isNavigationCollapsed)
                 }
                 .padding(.horizontal, 20)
-                .padding(.vertical, 12)
+                .padding(.vertical, 14)
             }
             .buttonStyle(PlainButtonStyle())
             
-            // Contenido visible con retardo
+            // Contenido de navegación
             if showNavigationContent {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 6) {
                     NavigationItemView(
                         icon: "doc.text",
                         title: "Todas las notas",
@@ -63,28 +63,33 @@ struct NavigationSectionView: View {
                         selectedCategory = nil
                     }
                     
+                    // Separador elegante
                     Rectangle()
-                        .fill(Color(.systemGray5))
-                        .frame(height: 1)
+                        .fill(
+                            LinearGradient(
+                                colors: [.clear, .primary.opacity(0.08), .clear],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(height: 0.8)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 8)
                     
+                    // Header de categorías
                     HStack {
                         Text("Categorías")
-                            .font(.caption)
+                            .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.secondary)
+                            .tracking(0.5)
                         
                         Spacer()
                         
-                        Button(action: {}) {
-                            Image(systemName: "plus")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
                     }
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 4)
+                    .padding(.bottom, 6)
                     
+                    // Lista de categorías
                     ForEach(categories, id: \.id) { category in
                         let notesCount = category.id == "recent" ?
                             viewModel.notes.filter { $0.isRecent }.count :
@@ -103,14 +108,16 @@ struct NavigationSectionView: View {
                     }
                 }
                 .padding(.bottom, 16)
-                .transition(.opacity.combined(with: .slide))
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemGray6).opacity(0.4))
+        )
         .onAppear {
-            // Asegurar que arranca retraído
             isNavigationCollapsed = true
             showNavigationContent = false
         }
-        .background(Color(.systemGray6).opacity(0.3))
     }
 }

@@ -15,7 +15,6 @@ struct MainView: View {
     @State private var showProfileView = false
     @State private var searchText = ""
     @State private var selectedCategory: String? = nil
-    @State private var isNavigationCollapsed = true
     
     // MARK: - Constants
     private let categories = NoteCategory.categories
@@ -23,41 +22,71 @@ struct MainView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
-                // ✅ Header - Usando componente
+                // Header Premium
                 MainHeaderView(
                     showCreateView: $showCreateView,
                     showProfileView: $showProfileView
                 )
                 .environmentObject(viewModel)
-                .headerBackground()
-                
-                // ✅ Barra de búsqueda - Usando componente
-                SearchBarView(searchText: $searchText)
-                
-                // ✅ Contenido principal
-                VStack(spacing: 0) {
-                    // ✅ Navegación - Usando componente
-                    NavigationSectionView(
-                        isNavigationCollapsed: $isNavigationCollapsed,
-                        selectedCategory: $selectedCategory,
-                        categories: categories
+                .background(
+                    // Fondo con gradiente radial sutil
+                    RadialGradient(
+                        colors: [
+                            Color(.systemBackground),
+                            Color(.systemGray6).opacity(0.2)
+                        ],
+                        center: .topLeading,
+                        startRadius: 50,
+                        endRadius: 300
                     )
-                    .environmentObject(viewModel)
-                    
-                    // Divisor
-                    Divider()
-                        .background(Color(.separator).opacity(0.3))
-                    
-                    // ✅ Grid de notas - Usando componente
-                    contentView
-                        .contentBackground()
+                )
+                .overlay(
+                    // Línea separadora elegante
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [.clear, .primary.opacity(0.06), .clear],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(height: 0.5)
+                        .opacity(0.8),
+                    alignment: .bottom
+                )
+                
+                // Barra de búsqueda integrada con navegación
+                SearchBarView(
+                    searchText: $searchText,
+                    selectedCategory: $selectedCategory,
+                    categories: categories
+                )
+                .environmentObject(viewModel)
+                .background(Color(.systemBackground))
+                
+                // Contenido principal con padding
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 20) {
+                        // Contenido de notas
+                        contentView
+                            .padding(.horizontal, 24)
+                    }
+                    .padding(.top, 8)
+                    .padding(.bottom, 32)
                 }
+                .background(
+                    // Fondo con patrón de papel
+                    PaperPatternBackground()
+                        .opacity(0.3)
+                )
             }
         }
         .navigationBarHidden(true)
         .navigationDestination(for: String.self) { noteId in
             NoteDetailView(noteId: noteId)
                 .environmentObject(viewModel)
+                .navigationBarHidden(true) // 👈 MUY IMPORTANTE
+
         }
         .sheet(isPresented: $showCreateView) {
             CreateNoteView()
@@ -80,10 +109,8 @@ struct MainView: View {
     @ViewBuilder
     private var contentView: some View {
         if viewModel.isLoading {
-            // ✅ Componente de loading
             LoadingStateView()
         } else if filteredNotes.isEmpty {
-            // ✅ Componente de estado vacío
             EmptyStateView(
                 showCreateView: $showCreateView,
                 showProfileView: $showProfileView
@@ -91,12 +118,18 @@ struct MainView: View {
             .environmentObject(viewModel)
             .transition(.opacity.combined(with: .scale(scale: 0.95)))
         } else {
-            // ✅ Componente de grid
-            NotesGridView(
-                notes: filteredNotes,
-                onNoteSelected: handleNoteSelection
-            )
-            .environmentObject(viewModel)
+            // Grid de notas mejorado
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: 16),
+                GridItem(.flexible(), spacing: 16)
+            ], spacing: 16) {
+                ForEach(filteredNotes, id: \.id) { note in
+                    NoteCardView(note: note) {
+                        handleNoteSelection(note.id)
+                    }
+                    .environmentObject(viewModel)
+                }
+            }
             .transition(.opacity.combined(with: .move(edge: .bottom)))
         }
     }
@@ -105,21 +138,18 @@ struct MainView: View {
     private var filteredNotes: [Note] {
         let allNotes = viewModel.notes
         
-        // Early return si no hay filtros
         guard selectedCategory != nil || !searchText.isEmpty else {
             return allNotes.sorted { $0.createdAt > $1.createdAt }
         }
         
         var result = allNotes
         
-        // Filtrar por categoría
         if let category = selectedCategory {
             result = result.filter { note in
                 category == "recent" ? note.isRecent : note.categoryId == category
             }
         }
         
-        // Filtrar por búsqueda
         if !searchText.isEmpty {
             let searchLower = searchText.lowercased()
             result = result.filter { note in
@@ -142,66 +172,27 @@ struct MainView: View {
     }
 }
 
-// MARK: - View Extensions
-extension View {
-    func headerBackground() -> some View {
-        self
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(.systemBackground),
-                        Color(.systemBackground).opacity(0.95)
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
-            .shadow(color: Color.black.opacity(0.05), radius: 1, x: 0, y: 1)
-    }
-    
-    func contentBackground() -> some View {
-        self
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(.systemBackground),
-                        Color(.systemGroupedBackground).opacity(0.3)
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
-    }
-}
-
-// MARK: - View Modifiers (Optional - for reusability)
-struct CreateNoteSheetModifier: ViewModifier {
-    @Binding var isPresented: Bool
-    let viewModel: NotesViewModel
-    
-    func body(content: Content) -> some View {
-        content
-            .sheet(isPresented: $isPresented) {
-                CreateNoteView()
-                    .environmentObject(viewModel)
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
+// MARK: - Paper Pattern Background
+struct PaperPatternBackground: View {
+    var body: some View {
+        VStack(spacing: 32) {
+            ForEach(0..<25, id: \.self) { _ in
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                .primary.opacity(Double.random(in: 0.01...0.02)),
+                                .clear,
+                                .primary.opacity(Double.random(in: 0.01...0.02))
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(height: 0.8)
+                    .opacity(Double.random(in: 0.3...0.8))
             }
-    }
-}
-
-struct ProfileSheetModifier: ViewModifier {
-    @Binding var isPresented: Bool
-    let viewModel: NotesViewModel
-    
-    func body(content: Content) -> some View {
-        content
-            .sheet(isPresented: $isPresented) {
-                ProfileConfigView()
-                    .environmentObject(viewModel)
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
-            }
+        }
     }
 }
 
@@ -210,24 +201,24 @@ struct LoadingStateView: View {
     @State private var isAnimating = false
     
     var body: some View {
-        VStack(spacing: 20) {
-            // Grid de skeleton cards
-            LazyVGrid(columns: [
-                GridItem(.flexible(), spacing: 12),
-                GridItem(.flexible(), spacing: 12)
-            ], spacing: 12) {
-                ForEach(0..<6, id: \.self) { _ in
-                    SkeletonCard()
-                }
+        LazyVGrid(columns: [
+            GridItem(.flexible(), spacing: 16),
+            GridItem(.flexible(), spacing: 16)
+        ], spacing: 16) {
+            ForEach(0..<6, id: \.self) { _ in
+                SkeletonCard()
             }
-            .padding(.horizontal, 16)
-            
-            Text("Cargando notas...")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .opacity(isAnimating ? 0.5 : 1.0)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(
+            VStack {
+                Spacer()
+                Text("Cargando notas...")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.secondary)
+                    .opacity(isAnimating ? 0.5 : 1.0)
+                    .padding(.bottom, 40)
+            }
+        )
         .onAppear {
             withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
                 isAnimating = true
@@ -241,32 +232,34 @@ struct SkeletonCard: View {
     @State private var isShimmering = false
     
     var body: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .fill(Color(.systemGray6))
-            .frame(height: 180)
+        RoundedRectangle(cornerRadius: 24)
+            .fill(Color(.systemGray6).opacity(0.6))
+            .frame(height: 200)
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 24)
                     .fill(
                         LinearGradient(
-                            gradient: Gradient(colors: [
+                            colors: [
                                 Color.clear,
-                                Color.white.opacity(0.4),
+                                Color.white.opacity(0.3),
                                 Color.clear
-                            ]),
+                            ],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
-                    .offset(x: isShimmering ? 300 : -300)
+                    .offset(x: isShimmering ? 250 : -250)
                     .animation(
-                        .linear(duration: 1.5)
+                        .linear(duration: 1.8)
                         .repeatForever(autoreverses: false),
                         value: isShimmering
                     )
             )
             .clipped()
             .onAppear {
-                isShimmering = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in: 0...0.5)) {
+                    isShimmering = true
+                }
             }
     }
 }
