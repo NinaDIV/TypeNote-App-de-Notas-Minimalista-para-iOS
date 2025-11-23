@@ -86,10 +86,12 @@ El contenido visual del proyecto (capturas de pantalla y un video de demostraci�
 
 ### 1. Pantalla de Inicio / Login (AWS Cognito)
 Muestra la interfaz de autenticación para un acceso seguro.
+
 ![Captura de la pantalla de Login y Registro de TypeNote](Galeri01/Pantalla%20de%20Inicio.png)
 
 ### 2. Formulario de Creación de Nota
 Vista que permite registrar una nueva nota, incluyendo la selección de categoría y color.
+
 ![Captura del formulario de creación de una nueva nota](Galeri01/Formulario%20de%20Creación.png)
 
 ### 3. Listado Principal de Notas
