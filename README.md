@@ -42,43 +42,14 @@ El proyecto sigue el patrón **MVVM** para una mejor modularidad:
 -   `NotesApp/View/`: Contiene las vistas declarativas de SwiftUI (`AuthView`, `MainView`, `NoteDetailView`, etc.).
 -   `NotesApp/ViewModel/`: Contiene la lógica de negocio, la gestión del estado y la comunicación con AWS (e.g., `AuthViewModel`, `NotesViewModel`).
 
-## 🛠️ Cómo Configurar y Ejecutar
 
-Para clonar y ejecutar la aplicación localmente, necesitarás tener instalado Xcode y el CLI de AWS Amplify.
-
-### Prerrequisitos
+### Requisitos
 
 * Xcode 15.0+
 * Swift 5.9+
 * Node.js y npm (para el CLI de Amplify)
 * AWS CLI configurado en tu máquina.
 
-### Pasos para la Configuración
-
-1.  **Clonar el Repositorio:**
-    ```bash
-    git clone [https://github.com/NinaDIV/TypeNote-App-de-Notas-Minimalista-para-iOS.git](https://github.com/NinaDIV/TypeNote-App-de-Notas-Minimalista-para-iOS.git)
-    cd TypeNote-App-de-Notas-Minimalista-para-iOS
-    ```
-
-2.  **Instalar y Configurar Amplify:**
-    > **Nota:** Se asume que el backend ya está aprovisionado. Si no lo está, debes usar `amplify init` y seguir las instrucciones.
-
-    Asegúrate de tener el archivo de configuración de Amplify en la raíz del proyecto:
-    ```bash
-    # Verifica que el archivo de configuración esté presente
-    ls amplifyconfiguration.json
-    ```
-
-3.  **Abrir en Xcode:**
-    ```bash
-    open NotesApp.xcodeproj
-    ```
-    Xcode automáticamente resolverá las dependencias del **Swift Package Manager**.
-
-4.  **Compilar y Ejecutar:**
-    * Selecciona un simulador de iOS (e.g., iPhone 15 Pro).
-    * Haz clic en el botón de "Run" (▶) o usa `Cmd + R` para compilar y ejecutar la aplicación.
 
 ## 📷 Galería y Demostración
 
@@ -116,4 +87,33 @@ El video demuestra el flujo completo de la aplicación: autenticación, CRUD de 
   - Implementación de **AWS DynamoDB** como base de datos NoSQL
   - Creación de **Lambdas** y configuración de **API Gateway** para el CRUD
   - Integración total del backend con la app iOS
+
+<!--
+### Pasos para la Configuración
+
+1.  **Clonar el Repositorio:**
+    ```bash
+    git clone https://github.com/NinaDIV/TypeNote-App-de-Notas-Minimalista-para-iOS.git
+    cd TypeNote-App-de-Notas-Minimalista-para-iOS
+    ```
+
+2.  **Instalar y Configurar Amplify:**
+    > **Nota:** Se asume que el backend ya está aprovisionado. Si no lo está, debes usar `amplify init` y seguir las instrucciones.
+
+    Asegúrate de tener el archivo de configuración de Amplify en la raíz del proyecto:
+    ```bash
+    # Verifica que el archivo de configuración esté presente
+    ls amplifyconfiguration.json
+    ```
+
+3.  **Abrir en Xcode:**
+    ```bash
+    open NotesApp.xcodeproj
+    ```
+    Xcode automáticamente resolverá las dependencias del **Swift Package Manager**.
+
+4.  **Compilar y Ejecutar:**
+    * Selecciona un simulador de iOS (e.g., iPhone 15 Pro).
+    * Haz clic en el botón de "Run" (▶) o usa `Cmd + R` para compilar y ejecutar la aplicación.
+-->
 
