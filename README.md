@@ -106,3 +106,14 @@ Interfaz para visualizar el contenido completo y modificar la nota existente.
 El video demuestra el flujo completo de la aplicación: autenticación, CRUD de notas y la sincronización en la nube.
 
 **[▶ Ver Video Completo de Funcionamiento (MP4)](Galeri01/FUNCIONAMIENTO.mp4)**
+
+## 🧩 Contribuciones
+
+- **Backend completo (AWS Amplify)** — Implementado por **Alarcón Paricanaza Anderson Aaron**  
+  Incluye:
+  - Configuración de AWS Amplify (Inicialización del proyecto)
+  - Implementación de **AWS Cognito** para autenticación
+  - Implementación de **AWS DynamoDB** como base de datos NoSQL
+  - Creación de **Lambdas** y configuración de **API Gateway** para el CRUD
+  - Integración total del backend con la app iOS
+
