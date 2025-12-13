@@ -2,6 +2,9 @@
 
 ✨ **TypeNote: Sistema de Gestión de Notas Minimalista para iOS con Sincronización en la Nube** ✨
 
+[![Vista previa](https://img.youtube.com/vi/jLpP_LXA7kU/0.jpg)](https://youtu.be/jLpP_LXA7kU)
+
+
 TypeNote es una aplicación móvil nativa desarrollada en Swift y SwiftUI, diseñada para ofrecer una experiencia de notas personal, moderna y elegante. Inspirada en herramientas de productividad, se enfoca en la velocidad, la simplicidad y la seguridad de la información mediante la integración con AWS Amplify.
 
 ## 🚀 Tecnologías Clave
